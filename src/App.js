@@ -1,23 +1,56 @@
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
+import { useState, useReducer } from 'react';
+import './App.scss';
+
+const initialNotesState = {
+  lastNoteCreated: null,
+  totalNotes: 0,
+  notes: [],
+}
+
+const notesReducer = (prevState, action) => {
+  switch(action.type) {
+    case 'ADD_NOTE': {
+      const newState = {
+        lastNoteCreated: new Date().toTimeString().slice(0, 8),
+        totalNotes: prevState.notes.length +1,
+        notes: [...prevState.notes, action.payload]
+      };
+      console.log('After ADD_STATE: ', newState);
+      return newState;
+    }
+  }
+};
+
+export function App() {
+  const [noteInput, setNoteInput] = useState('');
+  const [notesState, dispatch] = useReducer(notesReducer, initialNotesState)
+  const addNote = event => { 
+    event.preventDefault();
+
+    if(!noteInput){
+      return;
+    }
+    const newNote = {
+      text: noteInput,
+
+    };
+    dispatch({ type: 'ADD_NOTE', payload: newNote});
+   };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>
+        Sticky Notes
+      </h1>
+      <form onSubmit={addNote} className='note-form'>
+        <textarea value={noteInput}
+        onChange={event => setNoteInput(event.target.value)}
+          placeholder='Create a new note...'></textarea>
+        <button>Add</button>
+      </form>
+
+      { noteInput }
     </div>
   );
 }
